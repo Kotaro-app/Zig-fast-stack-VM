@@ -12,8 +12,8 @@ pub const VM = struct {
         const program_copy = try allocator.dupe(u8, program);
         errdefer allocator.free(program_copy);
 
-        var stack = std.ArrayList(i64).init(allocator);
-        var memory = std.ArrayList(u8).init(allocator);
+        const stack = std.ArrayList(i64).init(allocator);
+        const memory = std.ArrayList(u8).init(allocator);
 
         return VM {
             .stack = stack,
@@ -39,3 +39,16 @@ pub const VM = struct {
         return self.stack.popOrNull() orelse error.StackUnderflow;
     }
 };
+
+pub fn main() !void {
+    const allocator = std.heap.page_allocator;
+    const program = "test";
+    std.debug.print("Pre start", .{});
+    var vm = try VM.create(allocator,program);
+    std.debug.print("Start", .{});
+    for(1..10000) |_| {
+        try vm.push(8);
+    }
+    std.debug.print("Finish", .{});
+    defer vm.destroy(); 
+}
